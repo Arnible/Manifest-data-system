@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manifest Fellowship KIU — Management System</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#7F77DD;--purple-light:#EEEDFE;--purple-dark:#3C3489;--purple-mid:#534AB7;
+  --green-bg:#EAF3DE;--green-text:#3B6D11;
+  --blue-bg:#E6F1FB;--blue-text:#0C447C;
+  --amber-bg:#FAEEDA;--amber-text:#854F0B;
+  --red-bg:#FCEBEB;--red-text:#A32D2D;
+  --gray-bg:#F1EFE8;--gray-text:#5F5E5A;
+  --success:#22c55e;--warn:#f59e0b;--danger:#ef4444;
+  --border:#e5e5e5;--text:#1a1a1a;--text2:#666;--text3:#999;
+  --bg:#fff;--bg2:#f8f8f8;--bg3:#f1f1f1;
+  --radius:8px;--radius-lg:12px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --border:#333;--text:#f0f0f0;--text2:#aaa;--text3:#666;
+  --bg:#1a1a1a;--bg2:#242424;--bg3:#2e2e2e;
+  --purple-light:#1e1b3a;--purple-dark:#a09ae8;
+  --green-bg:#1a2e12;--green-text:#7dc95a;
+  --blue-bg:#102035;--blue-text:#7bbde8;
+  --amber-bg:#2e1e08;--amber-text:#d4a44c;
+  --red-bg:#2e0e0e;--red-text:#e87b7b;
+  --gray-bg:#2a2a2a;--gray-text:#aaa;
+}}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg3);color:var(--text);font-size:14px;min-height:100vh}
+.app{max-width:980px;margin:0 auto;padding:1rem}
+
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 16px;flex-wrap:wrap}
+.logo{width:42px;height:42px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:600;flex-shrink:0}
+.brand-name{font-size:15px;font-weight:600}
+.brand-sub{font-size:12px;color:var(--text2)}
+.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#25D366;margin-right:5px;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.wa-join{background:#25D366;color:#fff;border:none;padding:8px 16px;border-radius:var(--radius);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;margin-left:auto;white-space:nowrap;font-weight:500}
+.wa-join:hover{background:#1ead55}
+
+.nav{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:1.25rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:10px 12px}
+.nav button{padding:7px 14px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s;font-weight:500}
+.nav button.active{background:var(--purple-light);color:var(--purple-dark);border-color:var(--purple)}
+.nav .admin-btn{margin-left:auto;border-style:dashed}
+
+.page{display:none}.page.active{display:block}
+.card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.metric{background:var(--bg2);border-radius:var(--radius);padding:1rem;text-align:center;border:1px solid var(--border)}
+.metric .val{font-size:28px;font-weight:700;color:var(--purple)}
+.metric .lbl{font-size:11px;color:var(--text2);margin-top:4px;font-weight:500}
+.sh{font-size:15px;font-weight:600;margin-bottom:.75rem}
+.muted{font-size:12px;color:var(--text2)}
+
+label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px;margin-top:10px;font-weight:500}
+input,select,textarea{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:var(--bg);color:var(--text);font-family:inherit;transition:border .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--purple)}
+textarea{resize:vertical}
+.btn{padding:8px 16px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;color:var(--text);font-size:13px;cursor:pointer;transition:all .15s;font-weight:500;font-family:inherit}
+.btn:hover{background:var(--bg2)}
+.btn-primary{background:var(--purple);color:#fff;border-color:var(--purple)}
+.btn-primary:hover{background:var(--purple-mid)}
+.btn-success{background:var(--green-bg);color:var(--green-text);border-color:#7dc95a}
+.btn-warn{background:var(--amber-bg);color:var(--amber-text);border-color:#d4a44c}
+.btn-danger{background:var(--red-bg);color:var(--red-text);border-color:#e87b7b}
+.btn-purple{background:var(--purple-light);color:var(--purple-dark);border-color:var(--purple)}
+.btn-sm{padding:5px 11px;font-size:11px}
+.btn-wa{background:#25D366;color:#fff;border:none;padding:7px 14px;border-radius:var(--radius);font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-weight:500}
+.btn-wa:hover{background:#1ead55}
+
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.b-saint{background:var(--green-bg);color:var(--green-text)}
+.b-alumni{background:var(--blue-bg);color:var(--blue-text)}
+.b-minister{background:var(--amber-bg);color:var(--amber-text)}
+.b-other{background:var(--gray-bg);color:var(--gray-text)}
+.b-first{background:var(--red-bg);color:var(--red-text)}
+.b-purple{background:var(--purple-light);color:var(--purple-dark)}
+
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text2);font-weight:600;font-size:11px;white-space:nowrap;background:var(--bg2)}
+td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg2)}
+
+.flex{display:flex;gap:8px;align-items:center}
+.avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;background:var(--purple-light);color:var(--purple-dark)}
+
+.devo-card{border-left:4px solid var(--purple);padding:.9rem 1.1rem;background:var(--purple-light);border-radius:0 var(--radius) var(--radius) 0;margin-bottom:1rem}
+.devo-verse{font-size:15px;line-height:1.8;font-style:italic;color:var(--text)}
+.devo-ref{font-size:11px;color:var(--text2);margin-top:6px;font-weight:500}
+
+.toggle-wrap{position:relative;width:42px;height:24px;cursor:pointer;flex-shrink:0}
+.toggle-wrap input{opacity:0;width:0;height:0;position:absolute}
+.t-track{position:absolute;top:0;left:0;right:0;bottom:0;background:var(--border);border-radius:12px;transition:.3s}
+.t-track.on{background:var(--purple)}
+.t-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.t-thumb.on{transform:translateX(18px)}
+.r-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+
+.prog-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:4px}
+.prog-fill{height:100%;background:var(--purple);border-radius:3px;transition:width .5s}
+
+.prayer-item{padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+.prayer-item:last-child{border-bottom:none}
+
+.ai-spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(127,119,221,.3);border-top-color:var(--purple);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px 20px;border-radius:var(--radius-lg);font-size:13px;display:none;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.15);max-width:300px;font-weight:500}
+.toast.show{display:block;animation:slideIn .2s ease}
+@keyframes slideIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.countdown-pill{font-size:12px;padding:4px 12px;border-radius:20px;background:var(--purple-light);color:var(--purple-dark);font-weight:600;display:inline-block}
+
+.qr-frame{border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;background:#fff;display:inline-block}
+
+hr{border:none;border-top:1px solid var(--border);margin:1rem 0}
+
+@media(max-width:640px){
+  .g2,.g3,.g4{grid-template-columns:1fr}
+  .nav button{font-size:11px;padding:6px 10px}
+  .topbar{gap:8px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">M</div>
+  <div>
+    <div class="brand-name"><span class="live-dot"></span>Manifest Fellowship — KIU</div>
+    <div class="brand-sub">Fellowship Management System</div>
+  </div>
+  <button class="wa-join" onclick="joinWA()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    Join WhatsApp Group
+  </button>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button class="active" onclick="showPage('dashboard',this)">📊 Dashboard</button>
+  <button onclick="showPage('register',this)">✍️ Register</button>
+  <button onclick="showPage('database',this)">🗃️ Database</button>
+  <button onclick="showPage('feedback',this)">💬 Feedback / QR</button>
+  <button onclick="showPage('devotion',this)">📖 Devotion</button>
+  <button onclick="showPage('reminders',this)">🔔 Reminders</button>
+  <button onclick="showPage('announcements',this)">📢 Announcements</button>
+  <button onclick="showPage('admin',this)" class="admin-btn">⚙️ Admin</button>
+</div>
+
+<!-- ═══ DASHBOARD ═══ -->
+<div class="page active" id="page-dashboard">
+  <div class="g4" style="margin-bottom:1rem">
+    <div class="metric"><div class="val" id="m-total">0</div><div class="lbl">Total Registered</div></div>
+    <div class="metric"><div class="val" id="m-saints">0</div><div class="lbl">Saints (KIU)</div></div>
+    <div class="metric"><div class="val" id="m-first">0</div><div class="lbl">First Timers</div></div>
+    <div class="metric"><div class="val" id="m-consent">0</div><div class="lbl">WhatsApp Opt-Ins</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="sh">Next Fellowship</div>
+      <div style="font-size:22px;font-weight:700;color:var(--purple);margin:6px 0">Tuesday Service</div>
+      <div class="muted" id="fellowship-time-display">Every Tuesday — KIU Campus</div>
+      <div style="margin:12px 0"><span class="countdown-pill" id="countdown-label">Loading...</span></div>
+      <hr>
+      <div class="sh" style="font-size:13px;margin-bottom:.5rem">Attendance Breakdown</div>
+      <div id="cat-bars"></div>
+    </div>
+    <div class="card">
+      <div class="sh">Today's Devotion</div>
+      <div class="devo-card">
+        <div class="devo-verse" id="dash-verse">Loading today's devotion...</div>
+        <div class="devo-ref" id="dash-ref">Phaneroo Ministries</div>
+      </div>
+      <div class="flex" style="flex-wrap:wrap;gap:8px">
+        <button class="btn btn-sm btn-purple" onclick="showPage('devotion',document.querySelectorAll('.nav button')[4])">Full devotion →</button>
+        <button class="btn-wa btn-sm" onclick="shareDevotionWA()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Share
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sh">🙏 Prayer Wall</div>
+    <div id="prayer-wall"></div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <input type="text" id="prayer-input" placeholder="Add a prayer request..." style="flex:1">
+      <button class="btn btn-primary" onclick="addPrayer()">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ REGISTER ═══ -->
+<div class="page" id="page-register">
+  <div class="card">
+    <div class="sh">Register a New Member</div>
+    <div class="g2">
+      <div><label>Full Name *</label><input type="text" id="reg-name" placeholder="e.g. John Doe"></div>
+      <div><label>Phone / WhatsApp *</label><input type="tel" id="reg-phone" placeholder="+256 700 000 000"></div>
+    </div>
+    <div class="g2">
+      <div><label>Year of Study</label>
+        <select id="reg-year"><option value="">Select year</option><option>Year 1</option><option>Year 2</option><option>Year 3</option><option>Year 4</option><option>Year 5</option><option>Graduate</option></select>
+      </div>
+      <div><label>Residence / Hostel</label><input type="text" id="reg-residence" placeholder="e.g. Block A, Hostel 3"></div>
+    </div>
+    <div class="g2">
+      <div><label>Category *</label>
+        <select id="reg-category">
+          <option value="">Select category</option>
+          <option value="saint">Saint (KIU)</option>
+          <option value="alumni">Alumni</option>
+          <option value="minister">Minister</option>
+          <option value="kcu">KCU Campus</option>
+          <option value="cavendish">Cavendish University</option>
+          <option value="iuiu">IUIU Campus</option>
+          <option value="iuea">IUEA Campus</option>
+          <option value="kc">KC Campus</option>
+          <option value="clarke">Clarke International</option>
+          <option value="other">Other Campus</option>
+        </select>
+      </div>
+      <div><label>Visit Status</label>
+        <select id="reg-status">
+          <option value="regular">Regular Attendee</option>
+          <option value="firsttimer">First Timer</option>
+        </select>
+      </div>
+    </div>
+    <div><label>Email (optional)</label><input type="email" id="reg-email" placeholder="john@example.com"></div>
+    <div><label>Prayer Request / Testimony</label><textarea id="reg-feedback" rows="3" placeholder="Share your prayer request or how the fellowship blessed you..."></textarea></div>
+    <div style="margin-top:12px">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:0">
+        <input type="checkbox" id="reg-consent" style="width:auto;cursor:pointer">
+        <span style="font-size:13px;color:var(--text)">I consent to receive WhatsApp reminders about fellowship</span>
+      </label>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="registerMember()">✓ Register Member</button>
+      <button class="btn" onclick="clearRegForm()">Clear</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DATABASE ═══ -->
+<div class="page" id="page-database">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
+      <div class="sh" style="margin:0">Members Database</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <input type="text" placeholder="Search name or contact..." oninput="filterTable(this.value)" style="width:200px;padding:7px 11px;font-size:12px">
+        <select onchange="filterCategory(this.value)" style="width:auto;padding:7px 10px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text)">
+          <option value="">All categories</option>
+          <option value="saint">Saints</option>
+          <option value="alumni">Alumni</option>
+          <option value="minister">Ministers</option>
+          <option value="firsttimer">First Timers</option>
+          <option value="kcu">KCU</option>
+          <option value="cavendish">Cavendish</option>
+        </select>
+        <button class="btn btn-success btn-sm" onclick="downloadCSV()">⬇ Download CSV</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Category</th><th>Year</th><th>Residence</th><th>Contact</th><th>Status</th><th>WA Consent</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody id="db-body"></tbody>
+      </table>
+    </div>
+    <div class="muted" style="margin-top:10px" id="db-count"></div>
+  </div>
+</div>
+
+<!-- ═══ FEEDBACK / QR ═══ -->
+<div class="page" id="page-feedback">
+  <div class="g2">
+    <div class="card">
+      <div class="sh">Quick Feedback Form</div>
+      <label>Your Name</label><input type="text" id="fb-name" placeholder="Full name">
+      <label>Contact</label><input type="tel" id="fb-contact" placeholder="+256 ...">
+      <label>How was the fellowship?</label>
+      <select id="fb-rating">
+        <option>Excellent — God showed up!</option>
+        <option>Great — I was blessed</option>
+        <option>Good — It was helpful</option>
+        <option>Average</option>
+      </select>
+      <label>Message / Testimony</label>
+      <textarea id="fb-message" rows="3" placeholder="Share a testimony or prayer request..."></textarea>
+      <label>First time with us?</label>
+      <select id="fb-firsttime">
+        <option value="no">No, I've been here before</option>
+        <option value="yes">Yes! First time</option>
+      </select>
+      <div style="margin-top:14px">
+        <button class="btn btn-primary" onclick="submitFeedback()">Submit Feedback</button>
+      </div>
+      <hr>
+      <div class="sh" style="font-size:13px">Recent Feedback</div>
+      <div id="feedback-list"></div>
+    </div>
+    <div class="card">
+      <div class="sh">Scan to Give Feedback</div>
+      <div class="muted" style="margin-bottom:1rem">Members scan this QR code to open the feedback form. Print and display at the venue.</div>
+      <div style="text-align:center;margin:1rem 0">
+        <div class="qr-frame">
+          <svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="150" height="150" fill="white"/>
+            <rect x="10" y="10" width="50" height="50" rx="5" fill="none" stroke="#1a1a1a" stroke-width="4"/>
+            <rect x="20" y="20" width="30" height="30" fill="#1a1a1a"/>
+            <rect x="90" y="10" width="50" height="50" rx="5" fill="none" stroke="#1a1a1a" stroke-width="4"/>
+            <rect x="100" y="20" width="30" height="30" fill="#1a1a1a"/>
+            <rect x="10" y="90" width="50" height="50" rx="5" fill="none" stroke="#1a1a1a" stroke-width="4"/>
+            <rect x="20" y="100" width="30" height="30" fill="#1a1a1a"/>
+            <rect x="75" y="75" width="10" height="10" fill="#1a1a1a"/>
+            <rect x="90" y="75" width="10" height="10" fill="#1a1a1a"/>
+            <rect x="105" y="75" width="10" height="10" fill="#1a1a1a"/>
+            <rect x="120" y="75" width="10" height="10" fill="#1a1a1a"/>
+            <rect x="135" y="75" width="10" height="10" fill="#1a1a1a"/>
+            <rect x="75" y="90" width="10" height="10" fill="#1a1a1a"/>
+            <rect x="105" y="90" width="10" height="10" fill="#1a1a1a"/>
+            <rect x="135" y="90" width="10" height="10" fill="#1a1a1a"/>
+            <rect x="75" y="105" width="10" height="10" fill="#1a1a1a"/>
+            <rect x="90" y="105" width="10" height="10" fill="#1a1a1a"/>
+            <rect x="120" y="105" width="10" height="10" fill="#1a1a1a"/>
+            <rect x="75" y="120" width="10" height="10" fill="#1a1a1a"/>
+            <rect x="105" y="120" width="10" height="10" fill="#1a1a1a"/>
+            <rect x="120" y="120" width="10" height="10" fill="#1a1a1a"/>
+            <rect x="135" y="120" width="10" height="10" fill="#1a1a1a"/>
+            <rect x="75" y="135" width="10" height="10" fill="#1a1a1a"/>
+            <rect x="90" y="135" width="10" height="10" fill="#1a1a1a"/>
+            <rect x="105" y="135" width="10" height="10" fill="#1a1a1a"/>
+            <rect x="135" y="135" width="10" height="10" fill="#1a1a1a"/>
+          </svg>
+        </div>
+        <div class="muted" style="margin-top:8px;font-size:11px">manifest-fellowship-kiu.vercel.app/feedback</div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-sm" onclick="window.print()">🖨 Print QR</button>
+        <button class="btn-wa btn-sm" onclick="shareQRWA()">Share Link via WA</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DEVOTION ═══ -->
+<div class="page" id="page-devotion">
+  <div class="g2">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.75rem;flex-wrap:wrap;gap:8px">
+        <div>
+          <div class="sh">Daily Devotion</div>
+          <div class="muted" id="dev-date"></div>
+        </div>
+        <span class="badge b-purple">Phaneroo Style</span>
+      </div>
+      <div class="devo-card">
+        <div class="devo-verse" id="dev-verse">"For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future."</div>
+        <div class="devo-ref" id="dev-ref">— Jeremiah 29:11 | Phaneroo Ministries</div>
+      </div>
+      <div style="font-size:13px;line-height:1.9;color:var(--text);margin-bottom:1rem" id="dev-reflection">Today, walk in the assurance that God's plans for your life far exceed your circumstances. You are not just a student at KIU — you are positioned by divine purpose. His thoughts toward you are thoughts of peace. Begin this day anchored in His word.</div>
+      <div style="background:var(--purple-light);border-radius:var(--radius);padding:.85rem 1rem;margin-bottom:1rem;border-left:3px solid var(--purple)">
+        <div style="font-size:10px;color:var(--purple-mid);font-weight:700;letter-spacing:.08em;margin-bottom:5px">DECLARATION</div>
+        <div style="font-size:13px;color:var(--purple-dark);font-style:italic;line-height:1.7" id="dev-declaration">I declare that I walk in the purposes of God today. His plans for my life are good, and I trust His timing. I am not moved by what I see — I am moved by what He has said. In Jesus' name. Amen.</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-wa btn-sm" onclick="shareDevotionWA()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Share to WhatsApp
+        </button>
+        <button class="btn btn-sm btn-purple" onclick="generateDevotionAI()" id="gen-btn">
+          <span id="gen-spinner" style="display:none" class="ai-spin"></span>Generate with AI
+        </button>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="sh">Post Today's Devotion</div>
+        <div class="muted" style="margin-bottom:.75rem">Write manually or use AI to generate a fresh devotion.</div>
+        <label>Scripture Reference</label>
+        <input type="text" id="post-ref" placeholder="e.g. John 3:16">
+        <label>Verse Text</label>
+        <textarea id="post-verse" rows="3" placeholder="Paste the scripture verse here..."></textarea>
+        <label>Reflection</label>
+        <textarea id="post-reflection" rows="4" placeholder="Write the morning reflection..."></textarea>
+        <label>Declaration</label>
+        <textarea id="post-declaration" rows="3" placeholder="Write the daily declaration..."></textarea>
+        <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="postDevotion()">Post Devotion</button>
+          <button class="btn btn-sm btn-purple" onclick="generateDevotionAI()" id="gen-btn2">
+            <span id="gen-spinner2" style="display:none" class="ai-spin"></span>AI Generate
+          </button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="sh">Devotion Archive</div>
+        <div id="devo-archive" style="max-height:300px;overflow-y:auto"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ REMINDERS ═══ -->
+<div class="page" id="page-reminders">
+  <div class="g2">
+    <div class="card">
+      <div class="sh">Automated Reminders</div>
+      <div class="r-item">
+        <div><div style="font-size:13px;font-weight:600">Monday Evening (8 PM)</div><div class="muted">Sent to all consenting members</div></div>
+        <div class="toggle-wrap" onclick="toggleReminder('mon')">
+          <input type="checkbox" id="tog-mon">
+          <div class="t-track" id="track-mon"></div>
+          <div class="t-thumb" id="thumb-mon"></div>
+        </div>
+      </div>
+      <div class="r-item" style="border-bottom:none">
+        <div><div style="font-size:13px;font-weight:600">Tuesday Every 4 Hours</div><div class="muted">From 8 AM until service time</div></div>
+        <div class="toggle-wrap" onclick="toggleReminder('tue')">
+          <input type="checkbox" id="tog-tue">
+          <div class="t-track" id="track-tue"></div>
+          <div class="t-thumb" id="thumb-tue"></div>
+        </div>
+      </div>
+      <hr>
+      <div class="sh" style="font-size:13px">Consenting Contacts</div>
+      <div id="consent-list" style="max-height:220px;overflow-y:auto"></div>
+      <div class="muted" style="margin-top:8px" id="consent-count-label"></div>
+      <button class="btn btn-warn" style="margin-top:14px;width:100%" onclick="sendTestReminder()">📤 Send Test Reminder</button>
+    </div>
+    <div class="card">
+      <div class="sh">Message Templates</div>
+      <label>Monday Evening Template</label>
+      <textarea rows="4" id="mon-template">Good evening, Saint! 🙌 Just a reminder: Manifest Fellowship is TOMORROW. Come ready to encounter God. Tuesday service — see you there! #Manifest #KIU</textarea>
+      <label>Tuesday Countdown Template</label>
+      <textarea rows="4" id="tue-template">Manifest is TODAY! ✨ The presence of God is ready for you. Don't miss it — fellowship in a few hours. Come, bring a friend! #ManifestKIU</textarea>
+      <label>First Timer Follow-Up Template</label>
+      <textarea rows="3" id="first-template">Hi {name}! 🙏 It was a blessing to have you with us at Manifest Fellowship. We'd love to see you again next Tuesday. God bless you! #ManifestKIU</textarea>
+      <button class="btn btn-primary" style="margin-top:12px" onclick="saveTemplates()">Save Templates</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ANNOUNCEMENTS ═══ -->
+<div class="page" id="page-announcements">
+  <div class="g2">
+    <div class="card">
+      <div class="sh">Post Announcement</div>
+      <label>Title *</label>
+      <input type="text" id="ann-title" placeholder="e.g. Fasting and Prayer Week">
+      <label>Message</label>
+      <textarea id="ann-body" rows="4" placeholder="Type your announcement here..."></textarea>
+      <label>Target Audience</label>
+      <select id="ann-target">
+        <option>Everyone</option>
+        <option>Saints only</option>
+        <option>Ministers</option>
+        <option>First Timers</option>
+        <option>All campuses</option>
+        <option>Alumni</option>
+      </select>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="postAnnouncement()">Post Announcement</button>
+        <button class="btn-wa" onclick="pushAnnouncementWA()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Push to WhatsApp
+        </button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="sh">Recent Announcements</div>
+      <div id="ann-list">
+        <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:13px;font-weight:600">Fasting Week — April 21–25</div><span class="badge b-saint">Everyone</span></div>
+          <div class="muted" style="margin-top:3px">All saints are invited to join the corporate fast. Briefing on Tuesday.</div>
+        </div>
+        <div style="padding:10px 0">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:13px;font-weight:600">New Arrival Packs Available</div><span class="badge b-first">First Timers</span></div>
+          <div class="muted" style="margin-top:3px">Welcome packs for all first timers this semester. Collect at the door!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ADMIN ═══ -->
+<div class="page" id="page-admin">
+  <div class="card" id="admin-login-card">
+    <div class="sh">Admin Access</div>
+    <div class="muted" style="margin-bottom:1rem">Enter the admin password to manage system settings and data.</div>
+    <label>Password</label>
+    <input type="password" id="admin-pw" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')checkAdminLogin()" style="max-width:320px">
+    <div style="margin-top:12px"><button class="btn btn-primary" onclick="checkAdminLogin()">Login</button></div>
+    <div class="muted" style="margin-top:10px;font-size:11px">Default password: <code>manifest2024</code></div>
+  </div>
+  <div id="admin-panel" style="display:none">
+    <div class="g2">
+      <div class="card">
+        <div class="sh">System Settings</div>
+        <label>Change Admin Password</label>
+        <input type="password" id="new-pw" placeholder="New password (leave blank to keep)">
+        <label>WhatsApp Group Link</label>
+        <input type="text" id="wa-link" value="https://chat.whatsapp.com/manifest-kiu">
+        <label>Fellowship Day</label>
+        <select id="fellowship-day">
+          <option value="1">Monday</option>
+          <option value="2" selected>Tuesday</option>
+          <option value="3">Wednesday</option>
+          <option value="4">Thursday</option>
+          <option value="5">Friday</option>
+        </select>
+        <label>Fellowship Time</label>
+        <input type="text" id="fellowship-time-input" value="5:00 PM" placeholder="e.g. 5:00 PM">
+        <button class="btn btn-primary" style="margin-top:14px" onclick="saveSettings()">Save Settings</button>
+      </div>
+      <div class="card">
+        <div class="sh">Data Management</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="btn btn-success" onclick="downloadCSV()">⬇ Export All Members (CSV)</button>
+          <button class="btn btn-warn" onclick="downloadFeedbackCSV()">⬇ Export All Feedback (CSV)</button>
+          <hr>
+          <div class="sh" style="font-size:13px;margin-bottom:0">Database Stats</div>
+          <div style="font-size:13px;color:var(--text);line-height:2" id="admin-stats"></div>
+          <hr>
+          <button class="btn" onclick="loadSampleData(false)">Load Sample Data</button>
+          <button class="btn btn-danger" onclick="clearAllData()">⚠ Clear All Member Data</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+let members=[], feedbacks=[], devotions=[], prayers=[];
+let settings={waLink:'https://chat.whatsapp.com/manifest-kiu',fellowshipDay:2,fellowshipTime:'5:00 PM',adminPw:'manifest2024'};
+let reminders={mon:false,tue:false};
+let adminLoggedIn=false, currentDevotion=null;
+
+const LS={
+  get:k=>{try{return JSON.parse(localStorage.getItem(k))}catch{return null}},
+  set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+};
+
+function init(){
+  members=LS.get('mf-members')||[];
+  feedbacks=LS.get('mf-feedbacks')||[];
+  devotions=LS.get('mf-devotions')||[];
+  prayers=LS.get('mf-prayers')||[];
+  const s=LS.get('mf-settings'); if(s) settings={...settings,...s};
+  const r=LS.get('mf-reminders'); if(r) reminders=r;
+  const td=LS.get('mf-today-devo-'+new Date().toDateString()); if(td) currentDevotion=td;
+  if(members.length===0) loadSampleData(true);
+  updateMetrics();
+  updateCountdown(); setInterval(updateCountdown,60000);
+  renderPrayerWall();
+  renderTable(members);
+  renderConsentList();
+  renderReminderToggles();
+  renderDevotionArchive();
+  loadCurrentDevotion();
+  renderFeedbackList();
+  document.getElementById('dev-date').textContent=new Date().toDateString().toUpperCase();
+  document.getElementById('fellowship-time-display').textContent='Every '+['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][[0,1,2,3,4,5,6][settings.fellowshipDay]]+'day — '+settings.fellowshipTime+' — KIU Campus';
+}
+
+function loadSampleData(silent){
+  members=[
+    {id:1,name:"Amina Kagiso",category:"saint",year:"Year 2",residence:"Block A",contact:"+256 700 111 222",status:"firsttimer",email:"amina@email.com",feedback:"Really blessed!",consent:true,date:"15/04/2026"},
+    {id:2,name:"Joseph Mukasa",category:"minister",year:"Graduate",residence:"Off campus",contact:"+256 700 333 444",status:"regular",email:"joseph@email.com",feedback:"",consent:true,date:"15/04/2026"},
+    {id:3,name:"Sarah Nakato",category:"alumni",year:"Graduate",residence:"Kampala",contact:"+256 701 555 666",status:"regular",email:"",feedback:"",consent:false,date:"14/04/2026"},
+    {id:4,name:"Brian Ssekandi",category:"saint",year:"Year 3",residence:"Block C",contact:"+256 702 777 888",status:"regular",email:"",feedback:"The sermon changed me",consent:true,date:"14/04/2026"},
+    {id:5,name:"Mercy Apio",category:"saint",year:"Year 1",residence:"Block B",contact:"+256 703 999 000",status:"firsttimer",email:"",feedback:"",consent:true,date:"08/04/2026"},
+    {id:6,name:"Daniel Ochieng",category:"kcu",year:"Year 2",residence:"KCU Hostel",contact:"+256 704 111 333",status:"regular",email:"",feedback:"",consent:false,date:"08/04/2026"},
+    {id:7,name:"Grace Nalwoga",category:"saint",year:"Year 4",residence:"Block D",contact:"+256 705 222 444",status:"regular",email:"grace@email.com",feedback:"",consent:true,date:"01/04/2026"},
+    {id:8,name:"Patrick Opolot",category:"saint",year:"Year 2",residence:"Block A",contact:"+256 706 333 555",status:"regular",email:"",feedback:"",consent:true,date:"01/04/2026"},
+  ];
+  LS.set('mf-members',members);
+  updateMetrics(); renderTable(members); renderConsentList();
+  if(!silent) showToast('Sample data loaded!');
+}
+
+function updateMetrics(){
+  document.getElementById('m-total').textContent=members.length;
+  document.getElementById('m-saints').textContent=members.filter(m=>m.category==='saint').length;
+  document.getElementById('m-first').textContent=members.filter(m=>m.status==='firsttimer').length;
+  document.getElementById('m-consent').textContent=members.filter(m=>m.consent).length;
+  renderCatBars();
+  const el=document.getElementById('admin-stats'); if(el) el.innerHTML=`Total members: <strong>${members.length}</strong><br>Feedback entries: <strong>${feedbacks.length}</strong><br>Devotions archived: <strong>${devotions.length}</strong><br>Prayer requests: <strong>${prayers.length}</strong>`;
+}
+
+function renderCatBars(){
+  const cats=[{k:'saint',l:'Saints',c:'#639922'},{k:'alumni',l:'Alumni',c:'#378ADD'},{k:'minister',l:'Ministers',c:'#BA7517'},{k:'other_',l:'Other Campus',c:'#888'}];
+  const total=members.length||1;
+  document.getElementById('cat-bars').innerHTML=cats.map(c=>{
+    const count=c.k==='other_'?members.filter(m=>!['saint','alumni','minister'].includes(m.category)).length:members.filter(m=>m.category===c.k).length;
+    const pct=Math.round(count/total*100);
+    return`<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span>${c.l}</span><span style="color:var(--text2)">${count} (${pct}%)</span></div><div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${c.c}"></div></div></div>`;
+  }).join('');
+}
+
+function loadCurrentDevotion(){
+  const d=currentDevotion||(devotions.length>0?devotions[devotions.length-1]:null);
+  if(d) setDevotionDisplay(d);
+}
+
+function setDevotionDisplay(d){
+  document.getElementById('dash-verse').textContent=d.verse;
+  document.getElementById('dash-ref').textContent='— '+d.ref+' | Phaneroo Ministries';
+  document.getElementById('dev-verse').textContent=d.verse;
+  document.getElementById('dev-ref').textContent='— '+d.ref+' | Phaneroo Ministries';
+  document.getElementById('dev-reflection').textContent=d.reflection||'';
+  document.getElementById('dev-declaration').textContent=d.declaration||'';
+}
+
+function renderDevotionArchive(){
+  const el=document.getElementById('devo-archive');
+  if(devotions.length===0){el.innerHTML='<div class="muted" style="padding:10px 0">No devotions archived yet. Post the first one!</div>';return;}
+  el.innerHTML=devotions.slice().reverse().map((d,i)=>`
+    <div style="padding:9px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:12px;font-weight:600">${d.ref}</div>
+        <span class="muted" style="font-size:11px">${d.date}</span>
+      </div>
+      <div class="muted" style="margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.verse.substring(0,65)}...</div>
+      <button class="btn btn-sm" style="margin-top:6px;font-size:11px" onclick='loadArchiveDevo(${JSON.stringify(devotions[devotions.length-1-i]).replace(/</g,"\\u003c")})'>View</button>
+    </div>`).join('');
+}
+
+function loadArchiveDevo(d){setDevotionDisplay(d);showToast('Devotion loaded: '+d.ref);}
+
+function postDevotion(){
+  const ref=document.getElementById('post-ref').value.trim();
+  const verse=document.getElementById('post-verse').value.trim();
+  const reflection=document.getElementById('post-reflection').value.trim();
+  const declaration=document.getElementById('post-declaration').value.trim();
+  if(!ref||!verse){showToast('Please enter scripture reference and verse');return;}
+  const d={ref,verse,reflection,declaration,date:new Date().toLocaleDateString()};
+  devotions.push(d); currentDevotion=d;
+  LS.set('mf-devotions',devotions);
+  LS.set('mf-today-devo-'+new Date().toDateString(),d);
+  setDevotionDisplay(d); renderDevotionArchive();
+  ['post-ref','post-verse','post-reflection','post-declaration'].forEach(id=>document.getElementById(id).value='');
+  showToast('Devotion posted for today! ✓');
+}
+
+async function generateDevotionAI(){
+  const s1=document.getElementById('gen-spinner'), s2=document.getElementById('gen-spinner2');
+  const b1=document.getElementById('gen-btn'), b2=document.getElementById('gen-btn2');
+  [s1,s2].forEach(s=>s&&(s.style.display='inline-block'));
+  [b1,b2].forEach(b=>b&&(b.disabled=true));
+  showToast('Generating devotion with AI...');
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:1000,
+        messages:[{role:'user',content:`Generate a Phaneroo Ministries-style morning devotion for Manifest Fellowship KIU (Kampala International University campus Christian fellowship). Students are the audience.
+
+Return ONLY a JSON object with these keys:
+{
+  "ref": "Book Chapter:Verse (e.g. Romans 8:28)",
+  "verse": "The complete scripture verse in quotes",
+  "reflection": "3-4 sentences. Bold, faith-filled, Phaneroo voice. Address the student directly. Reference campus life or being a saint at KIU Uganda.",
+  "declaration": "2-3 sentences starting with I declare... for the student to speak aloud."
+}
+
+Today: ${new Date().toDateString()}. Return only valid JSON, nothing else.`}]
+      })
+    });
+    const data=await res.json();
+    const text=data.content.map(i=>i.text||'').join('');
+    const clean=text.replace(/```json|```/g,'').trim();
+    const devo=JSON.parse(clean);
+    document.getElementById('post-ref').value=devo.ref||'';
+    document.getElementById('post-verse').value=devo.verse||'';
+    document.getElementById('post-reflection').value=devo.reflection||'';
+    document.getElementById('post-declaration').value=devo.declaration||'';
+    setDevotionDisplay({...devo,date:new Date().toLocaleDateString()});
+    showToast('AI devotion generated! Review and click Post Devotion to save.');
+  }catch(e){showToast('Error generating devotion. Check connection.');console.error(e);}
+  [s1,s2].forEach(s=>s&&(s.style.display='none'));
+  [b1,b2].forEach(b=>b&&(b.disabled=false));
+}
+
+function shareDevotionWA(){
+  const verse=document.getElementById('dev-verse').textContent;
+  const ref=document.getElementById('dev-ref').textContent;
+  const text=`*MANIFEST FELLOWSHIP — KIU*\n*Morning Devotion | ${new Date().toDateString()}*\n\n"${verse}"\n${ref}\n\n_Come to fellowship and encounter God's presence!_ 🙏\n#ManifestKIU`;
+  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
+}
+
+function shareQRWA(){
+  const text='Scan this QR or click the link to give feedback for Manifest Fellowship KIU: https://manifest-fellowship-kiu.vercel.app/feedback #ManifestKIU';
+  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
+}
+
+function registerMember(){
+  const name=document.getElementById('reg-name').value.trim();
+  const phone=document.getElementById('reg-phone').value.trim();
+  if(!name||!phone){showToast('Please fill in name and contact');return;}
+  const feedback=document.getElementById('reg-feedback').value.trim();
+  const m={
+    id:Date.now(),name,contact:phone,
+    year:document.getElementById('reg-year').value||'—',
+    residence:document.getElementById('reg-residence').value||'—',
+    category:document.getElementById('reg-category').value||'saint',
+    status:document.getElementById('reg-status').value,
+    email:document.getElementById('reg-email').value,
+    feedback,
+    consent:document.getElementById('reg-consent').checked,
+    date:new Date().toLocaleDateString()
+  };
+  if(feedback) prayers.push({text:feedback,name:m.name,date:new Date().toLocaleDateString()});
+  members.push(m);
+  LS.set('mf-members',members); LS.set('mf-prayers',prayers);
+  updateMetrics(); renderPrayerWall(); renderConsentList();
+  showToast(name+' registered! ✓');
+  if(m.consent) setTimeout(()=>showToast('WhatsApp reminder queued for '+phone),1600);
+  clearRegForm();
+}
+
+function clearRegForm(){
+  ['reg-name','reg-phone','reg-residence','reg-email','reg-feedback'].forEach(id=>document.getElementById(id).value='');
+  ['reg-year','reg-category'].forEach(id=>document.getElementById(id).selectedIndex=0);
+  document.getElementById('reg-status').selectedIndex=0;
+  document.getElementById('reg-consent').checked=false;
+}
+
+function badgeFor(cat,status){
+  if(status==='firsttimer') return'<span class="badge b-first">First Timer</span>';
+  const map={saint:'b-saint',alumni:'b-alumni',minister:'b-minister'};
+  const cls=map[cat]||'b-other';
+  const labels={saint:'Saint',alumni:'Alumni',minister:'Minister',kcu:'KCU',cavendish:'Cavendish',iuiu:'IUIU',iuea:'IUEA',kc:'KC',clarke:'Clarke',other:'Other'};
+  return`<span class="badge ${cls}">${labels[cat]||cat}</span>`;
+}
+
+function renderTable(data){
+  document.getElementById('db-body').innerHTML=data.map(m=>`<tr>
+    <td><div class="flex"><div class="avatar" style="width:26px;height:26px;font-size:10px">${m.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div><span>${m.name}</span></div></td>
+    <td>${badgeFor(m.category,m.status)}</td>
+    <td>${m.year}</td>
+    <td>${m.residence}</td>
+    <td><a href="tel:${m.contact}" style="color:var(--purple);font-size:12px">${m.contact}</a></td>
+    <td>${m.status==='firsttimer'?'First Timer':'Regular'}</td>
+    <td>${m.consent?'<span style="color:var(--green-text);font-size:11px;font-weight:600">✓ Yes</span>':'<span style="color:var(--text3);font-size:11px">No</span>'}</td>
+    <td>${m.date||''}</td>
+    <td><div style="display:flex;gap:4px">
+      <button class="btn-wa btn-sm" onclick="messageOnWA('${m.contact}','${m.name.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>WA
+      </button>
+      <button class="btn btn-sm btn-danger" onclick="deleteMember(${m.id})">×</button>
+    </div></td></tr>`).join('');
+  document.getElementById('db-count').textContent=data.length+' member(s) shown';
+}
+
+function messageOnWA(contact,name){
+  const num=contact.replace(/\s+/g,'').replace('+','');
+  const msg=`Hi ${name}! 🙏 Greetings from Manifest Fellowship KIU. We're glad to have you in our community. God bless you! #ManifestKIU`;
+  window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+function deleteMember(id){
+  if(!confirm('Remove this member?')) return;
+  members=members.filter(m=>m.id!==id);
+  LS.set('mf-members',members); updateMetrics(); renderTable(members); renderConsentList();
+  showToast('Member removed.');
+}
+
+function filterTable(q){renderTable(members.filter(m=>m.name.toLowerCase().includes(q.toLowerCase())||m.contact.includes(q)));}
+function filterCategory(cat){if(!cat){renderTable(members);return;}renderTable(members.filter(m=>m.category===cat||m.status===cat));}
+
+function downloadCSV(){
+  const rows=[['Name','Category','Year','Residence','Contact','Email','Status','Feedback','WA Consent','Date']];
+  members.forEach(m=>rows.push([m.name,m.category,m.year,m.residence,m.contact,m.email||'',m.status,m.feedback||'',m.consent?'Yes':'No',m.date||'']));
+  const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='manifest_kiu_members.csv'; a.click();
+  showToast('Members CSV downloaded!');
+}
+
+function downloadFeedbackCSV(){
+  const rows=[['Name','Contact','Rating','Message','First Timer','Date']];
+  feedbacks.forEach(f=>rows.push([f.name,f.contact||'',f.rating,f.message||'',f.firsttime,f.date||'']));
+  const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='manifest_kiu_feedback.csv'; a.click();
+  showToast('Feedback CSV downloaded!');
+}
+
+function submitFeedback(){
+  const name=document.getElementById('fb-name').value.trim();
+  if(!name){showToast('Please enter your name');return;}
+  const fb={name,contact:document.getElementById('fb-contact').value,rating:document.getElementById('fb-rating').value,message:document.getElementById('fb-message').value,firsttime:document.getElementById('fb-firsttime').value,date:new Date().toLocaleDateString()};
+  feedbacks.push(fb); LS.set('mf-feedbacks',feedbacks); renderFeedbackList();
+  showToast('Feedback submitted! Thank you, '+name+'! 🙏');
+  ['fb-name','fb-contact','fb-message'].forEach(id=>document.getElementById(id).value='');
+}
+
+function renderFeedbackList(){
+  const el=document.getElementById('feedback-list');
+  if(!feedbacks.length){el.innerHTML='<div class="muted" style="padding:8px 0">No feedback yet.</div>';return;}
+  el.innerHTML=feedbacks.slice().reverse().slice(0,10).map(f=>`
+    <div style="display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div class="avatar" style="width:26px;height:26px;font-size:10px">${f.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600">${f.name}${f.firsttime==='yes'?' <span class="badge b-first" style="font-size:10px">First Timer</span>':''}</div>
+        <div class="muted" style="font-size:11px">${f.rating}</div>
+        ${f.message?`<div style="font-size:12px;margin-top:2px">${f.message}</div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function renderPrayerWall(){
+  const base=[{text:'Prayers for upcoming exams — Year 2 Saints'},{text:'Healing request from a first timer'},{text:'Breakthrough for KIU campus outreach'}];
+  const all=[...base,...prayers.map(p=>({text:p.text,name:p.name}))];
+  document.getElementById('prayer-wall').innerHTML=all.map(p=>`
+    <div class="prayer-item">🙏 <span>${p.text}${p.name?` <em style="font-size:11px;color:var(--text2)">— ${p.name}</em>`:''}</span></div>`).join('');
+}
+
+function addPrayer(){
+  const input=document.getElementById('prayer-input');
+  const text=input.value.trim(); if(!text) return;
+  prayers.push({text,date:new Date().toLocaleDateString()});
+  LS.set('mf-prayers',prayers); renderPrayerWall(); input.value=''; showToast('Prayer request added! 🙏');
+}
+
+function renderConsentList(){
+  const consenting=members.filter(m=>m.consent);
+  document.getElementById('consent-list').innerHTML=consenting.slice(0,8).map(m=>`
+    <div class="flex" style="padding:7px 0;border-bottom:1px solid var(--border)">
+      <div class="avatar" style="width:26px;height:26px;font-size:10px">${m.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div>
+      <div style="font-size:13px;flex:1">${m.name}</div>
+      <span class="badge ${m.category==='saint'?'b-saint':m.category==='alumni'?'b-alumni':m.category==='minister'?'b-minister':'b-other'}">${m.category}</span>
+    </div>`).join('');
+  document.getElementById('consent-count-label').textContent=consenting.length+' contacts consented to reminders';
+}
+
+function renderReminderToggles(){
+  ['mon','tue'].forEach(k=>{
+    const on=reminders[k];
+    document.getElementById('track-'+k).className='t-track'+(on?' on':'');
+    document.getElementById('thumb-'+k).className='t-thumb'+(on?' on':'');
+  });
+}
+
+function toggleReminder(k){
+  reminders[k]=!reminders[k]; LS.set('mf-reminders',reminders); renderReminderToggles();
+  showToast('Reminder '+(reminders[k]?'enabled ✓':'disabled')+' for '+(k==='mon'?'Monday':'Tuesday'));
+}
+
+function saveTemplates(){LS.set('mf-templates',{mon:document.getElementById('mon-template').value,tue:document.getElementById('tue-template').value,first:document.getElementById('first-template').value});showToast('Templates saved! ✓');}
+
+function sendTestReminder(){
+  const count=members.filter(m=>m.consent).length;
+  const tpl=document.getElementById('tue-template').value;
+  window.open('https://wa.me/?text='+encodeURIComponent(tpl),'_blank');
+  showToast('Opening WhatsApp with reminder for '+count+' contacts...');
+}
+
+function postAnnouncement(){
+  const title=document.getElementById('ann-title').value.trim();
+  if(!title){showToast('Please enter an announcement title');return;}
+  const body=document.getElementById('ann-body').value;
+  const target=document.getElementById('ann-target').value;
+  const badgeMap={Everyone:'b-saint','Saints only':'b-saint',Ministers:'b-minister','First Timers':'b-first','All campuses':'b-other',Alumni:'b-alumni'};
+  const div=document.createElement('div');
+  div.style.cssText='padding:10px 0;border-bottom:1px solid var(--border)';
+  div.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:13px;font-weight:600">${title}</div><span class="badge ${badgeMap[target]||'b-other'}">${target}</span></div><div class="muted" style="margin-top:3px">${body}</div>`;
+  document.getElementById('ann-list').prepend(div);
+  showToast('Announcement posted!');
+  document.getElementById('ann-title').value=''; document.getElementById('ann-body').value='';
+}
+
+function pushAnnouncementWA(){
+  const title=document.getElementById('ann-title').value.trim()||'Manifest Fellowship Announcement';
+  const body=document.getElementById('ann-body').value;
+  window.open('https://wa.me/?text='+encodeURIComponent(`*MANIFEST FELLOWSHIP — KIU*\n\n*${title}*\n\n${body}\n\n_#ManifestKIU_`),'_blank');
+}
+
+function checkAdminLogin(){
+  const pw=document.getElementById('admin-pw').value;
+  if(pw===settings.adminPw){
+    adminLoggedIn=true;
+    document.getElementById('admin-login-card').style.display='none';
+    document.getElementById('admin-panel').style.display='block';
+    updateMetrics(); showToast('Admin access granted! ✓');
+  } else {showToast('Incorrect password. Try: manifest2024');}
+}
+
+function saveSettings(){
+  const newPw=document.getElementById('new-pw').value; if(newPw) settings.adminPw=newPw;
+  settings.waLink=document.getElementById('wa-link').value;
+  settings.fellowshipDay=parseInt(document.getElementById('fellowship-day').value);
+  settings.fellowshipTime=document.getElementById('fellowship-time-input').value;
+  LS.set('mf-settings',settings);
+  document.getElementById('fellowship-time-display').textContent='Every '+['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][settings.fellowshipDay]+'day — '+settings.fellowshipTime+' — KIU Campus';
+  showToast('Settings saved! ✓');
+}
+
+function clearAllData(){
+  if(!confirm('Delete ALL member data? This cannot be undone.')) return;
+  members=[]; LS.set('mf-members',members); updateMetrics(); renderTable(members); renderConsentList();
+  showToast('All member data cleared.');
+}
+
+function joinWA(){window.open(settings.waLink,'_blank');}
+
+function updateCountdown(){
+  const now=new Date(), day=now.getDay(), target=settings.fellowshipDay||2;
+  let diff=target-day; if(diff<0) diff+=7; if(diff===0&&now.getHours()>=21) diff=7;
+  if(diff===0){document.getElementById('countdown-label').textContent='Fellowship is TODAY! 🙌';return;}
+  const next=new Date(now); next.setDate(now.getDate()+diff); next.setHours(17,0,0,0);
+  const ms=next-now, h=Math.floor(ms/3600000), m=Math.floor((ms%3600000)/60000);
+  document.getElementById('countdown-label').textContent=h+'h '+m+'m to next fellowship';
+}
+
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(btn){document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+  if(id==='database') renderTable(members);
+  if(id==='devotion') document.getElementById('dev-date').textContent=new Date().toDateString().toUpperCase();
+  if(id==='admin'&&adminLoggedIn){document.getElementById('admin-login-card').style.display='none';document.getElementById('admin-panel').style.display='block';updateMetrics();}
+}
+
+let toastTimer;
+function showToast(msg){
+  clearTimeout(toastTimer);
+  const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show';
+  toastTimer=setTimeout(()=>t.className='toast',3500);
+}
+
+init();
+</script>
+</body>
+</html>
